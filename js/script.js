@@ -138,7 +138,7 @@ function optionSelected(answer) {
         // Auto koreksi jawaban benar
         for (let i = 0; i < allOptions; i++) {
             if (optionList.children[i].textContent.slice(3) === correctAnswer) {
-                optionList.children[i].setAttribute('class', 'option correct');
+               // optionList.children[i].setAttribute('class', 'option correct');
             }
         }
     }
