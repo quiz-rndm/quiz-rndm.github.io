@@ -33,13 +33,13 @@ let questions = [{
     },
     {
         numb: 4,
-        question: "Redistribute digunakan untuk?",
-        answer: "Menghubungkan routing protokol yang berbeda dalam 1 topologi",
+        question: "Apa yang selalu naik tapi ga pernah turun?",
+        answer: "Usia",
         options: [
-            "Membatasi lalu lintas jaringan",
-            "Menghubungkan routing protokol yang berbeda dalam 1 topologi",
-            "Mengurangi jumlah router yang terlibat dalam proses routing",
-            "Semua salah"
+            "Balon",
+            "Panas",
+            "Asap",
+            "Usia"
         ]
     },
     {
