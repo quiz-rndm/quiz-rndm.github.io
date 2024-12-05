@@ -8,74 +8,60 @@ const quizBox = document.querySelector('.quiz-box');
 const resultBox = document.querySelector('.result-box');
 const tryAgainBtn = document.querySelector('.tryAgain-btn');
 const goHomeBtn = document.querySelector('.goHome-btn');
-const nextBtn = document.querySelector('.next-btn');
-const optionList = document.querySelector('.option-list');
 
 let shuffledQuestions = []; // Menyimpan urutan soal yang diacak
 let questionCount = 0;
 let questionNumb = 1; // Nomor soal mulai dari 1
-let userScore = 0;
+let correctAnswers = []; // Array untuk menyimpan hasil jawaban
 
-// Event listener untuk tombol start
 startBtn.onclick = () => {
     popupInfo.classList.add('active');
     main.classList.add('active');
-}
+};
 
-// Event listener untuk tombol exit
 exitBtn.onclick = () => {
     popupInfo.classList.remove('active');
     main.classList.remove('active');
-}
+};
 
-// Event listener untuk tombol continue
 continueBtn.onclick = () => {
-    shuffledQuestions = shuffleArray([...questions]); // Acak soal dan simpan urutan
+    shuffledQuestions = shuffleArray([...questions]); // Acak soal
     quizSection.classList.add('active');
     popupInfo.classList.remove('active');
     main.classList.remove('active');
     quizBox.classList.add('active');
-
     showQuestions(0); // Tampilkan soal pertama
     questionCounter(1); // Tampilkan nomor soal pertama dimulai dari 1
-    headerScore(); // Update skor di header
-}
+    headerScore();
+};
 
-// Event listener untuk tombol try again
 tryAgainBtn.onclick = () => {
     quizBox.classList.add('active');
     nextBtn.classList.remove('active');
     resultBox.classList.remove('active');
-
     questionCount = 0;
     questionNumb = 1; // Mulai dari soal 1
-    userScore = 0;
-
+    correctAnswers = []; // Reset jawaban
     shuffledQuestions = shuffleArray([...questions]); // Acak soal lagi
-
     showQuestions(questionCount);
     questionCounter(questionNumb);
     headerScore();
-}
+};
 
-// Event listener untuk tombol go home
 goHomeBtn.onclick = () => {
     quizSection.classList.remove('active');
     nextBtn.classList.remove('active');
     resultBox.classList.remove('active');
-
     questionCount = 0;
     questionNumb = 1; // Mulai dari soal 1
-    userScore = 0;
-
+    correctAnswers = []; // Reset jawaban
     shuffledQuestions = shuffleArray([...questions]); // Acak soal lagi
-
     showQuestions(questionCount);
     questionCounter(questionNumb);
     headerScore();
-}
+};
 
-// Event listener untuk tombol next
+const nextBtn = document.querySelector('.next-btn');
 nextBtn.onclick = () => {
     if (questionCount < shuffledQuestions.length - 1) {
         questionCount++;
@@ -84,15 +70,17 @@ nextBtn.onclick = () => {
         questionCounter(questionNumb);
         nextBtn.classList.remove('active');
     } else {
-        showResultBox(); // Jika soal habis, tampilkan hasil
+        showResultBox(); // Tampilkan hasil quiz
     }
-}
+};
+
+const optionList = document.querySelector('.option-list');
 
 // Fungsi untuk mengacak array
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]; // Tukar elemen
+        [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
 }
@@ -102,14 +90,10 @@ function showQuestions(index) {
     const questionText = document.querySelector('.question-text');
     const question = shuffledQuestions[index]; // Mengambil soal yang sudah diacak
 
-    // Menampilkan nomor soal dan soal
     questionText.textContent = `${index + 1}. ${question.question}`;
 
-    // Salin opsi dan acak
     let options = [...question.options];
-    shuffleArray(options);
-
-    // Buat opsi dengan label tetap (A, B, C, D)
+    shuffleArray(options); // Acak opsi
     const labels = ['A', 'B', 'C', 'D'];
     let optionTag = options.map((option, i) =>
         `<div class="option"><span>${labels[i]}. ${option}</span></div>`
@@ -117,12 +101,11 @@ function showQuestions(index) {
     optionList.innerHTML = optionTag;
 
     const option = document.querySelectorAll('.option');
-    option.forEach((opt, i) => {
-        opt.setAttribute('onclick', 'optionSelected(this)');
-    });
+    for (let i = 0; i < option.length; i++) {
+        option[i].setAttribute('onclick', 'optionSelected(this)');
+    }
 }
 
-// Menangani pilihan jawaban
 function optionSelected(answer) {
     let userAnswer = answer.textContent.slice(3); // Mengambil teks jawaban tanpa label
     let correctAnswer = shuffledQuestions[questionCount].answer;
@@ -131,16 +114,10 @@ function optionSelected(answer) {
 
     if (userAnswer === correctAnswer) {
         answer.classList.add('correct');
-        userScore += 1;
-        headerScore();
+        correctAnswers.push(true); // Tambahkan hasil benar
     } else {
         answer.classList.add('incorrect');
-        // Auto koreksi jawaban benar
-        for (let i = 0; i < allOptions; i++) {
-            if (optionList.children[i].textContent.slice(3) === correctAnswer) {
-               // optionList.children[i].setAttribute('class', 'option correct');
-            }
-        }
+        correctAnswers.push(false); // Tambahkan hasil salah
     }
 
     // Nonaktifkan opsi lain
@@ -151,22 +128,22 @@ function optionSelected(answer) {
     nextBtn.classList.add('active');
 }
 
-// Fungsi untuk menampilkan nomor soal
 function questionCounter(index) {
     const questionTotal = document.querySelector('.question-total');
     questionTotal.textContent = `${index} dari ${shuffledQuestions.length} Pertanyaan`;
 }
 
-// Update skor di header
 function headerScore() {
     const headerScoreText = document.querySelector('.header-score');
-    headerScoreText.textContent = `Score: ${userScore} / ${shuffledQuestions.length}`;
+    headerScoreText.textContent = `Score: ? / ${shuffledQuestions.length}`; // Tampilkan placeholder
 }
 
-// Menampilkan hasil akhir
 function showResultBox() {
     quizBox.classList.remove('active');
     resultBox.classList.add('active');
+
+    // Hitung jumlah jawaban benar
+    let userScore = correctAnswers.filter(isCorrect => isCorrect).length;
 
     const scoreText = document.querySelector('.score-text');
     scoreText.textContent = `Score kamu ${userScore} dari ${shuffledQuestions.length}`;
@@ -186,10 +163,4 @@ function showResultBox() {
             clearInterval(progress);
         }
     }, speed);
-}
-
-// Cegah salin teks di halaman
-document.addEventListener('copy', function(e) {
-    e.preventDefault(); // Mencegah tindakan salin
-    alert("Salin teks tidak diizinkan.");
-});
+                                                }
